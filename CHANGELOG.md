@@ -2,6 +2,7 @@
 
 # jison-idea-plugin Changelog
 
-## [Unreleased]
+## [0.0.1] - 2026-05-08
 ### Added
-- Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
+- Jison and Jison Schema language support for `.jison`, `.jisonschema`, and `.jison.schema` files.
+- Syntax highlighting for keys, values, braces, directives, escapes, and comments.
