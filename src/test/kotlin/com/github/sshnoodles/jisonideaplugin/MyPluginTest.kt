@@ -1,8 +1,11 @@
 package com.github.sshnoodles.jisonideaplugin
 
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.github.sshnoodles.jisonideaplugin.lang.JisonFormatAnnotator
+import com.github.sshnoodles.jisonideaplugin.lang.JisonFormatter
 import com.github.sshnoodles.jisonideaplugin.lang.JisonLexer
 import com.github.sshnoodles.jisonideaplugin.lang.JisonTypes
 
@@ -207,5 +210,97 @@ class MyPluginTest : BasePlatformTestCase() {
             "Expected error range to span more than one character, but was ${openBraceInfo!!.startOffset}..${openBraceInfo.endOffset}",
             openBraceInfo.endOffset - openBraceInfo.startOffset > 1
         )
+    }
+
+    fun testFormatterNormalizesLineIndentAndColonSpacing() {
+        val input = """
+            root:{
+            key1:value1
+            child:{
+            key2:  value2
+            }
+            }
+        """.trimIndent()
+
+        val expected = """
+            root:{
+              key1: value1
+              child:{
+                key2: value2
+              }
+            }
+        """.trimIndent()
+
+        assertEquals(expected, JisonFormatter.formatText(input))
+    }
+
+    fun testFormatterRespectsCommentFlagDirective() {
+        val input = """
+            root:{
+            JISON_COMMENT_FLAG://
+            // comment line
+            key: value // trailing comment
+            }
+        """.trimIndent()
+
+        val expected = """
+            root:{
+              JISON_COMMENT_FLAG://
+              // comment line
+              key: value // trailing comment
+            }
+        """.trimIndent()
+
+        assertEquals(expected, JisonFormatter.formatText(input))
+    }
+
+    fun testReformatCodeAppliesJisonFormatting() {
+        val file = myFixture.configureByText(
+            "reformat.jison",
+            "root:{\nkey:value\nchild:{\nname:john\n}\n}\n"
+        )
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            CodeStyleManager.getInstance(project).reformat(file)
+        }
+
+        val expected = "root:{\n  key: value\n  child:{\n    name: john\n  }\n}\n"
+        assertEquals(expected.trimEnd(), file.text.trimEnd())
+    }
+
+    fun testFormatterExpandsEmptyObjectAndFormatsSiblingKeys() {
+        val input = """
+            a:{
+              a1:{
+              }
+            a2:{
+            }
+            }
+        """.trimIndent()
+
+        val expected = """
+            a:{
+              a1:{
+              }
+              a2:{
+              }
+            }
+        """.trimIndent()
+
+        assertEquals(expected, JisonFormatter.formatText(input))
+    }
+
+    fun testReformatCodeFormatsSiblingKeysInNestedBlock() {
+        val file = myFixture.configureByText(
+            "nested.jison",
+            "a:{\n  a1:{}\na2:{}\n}\n"
+        )
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            CodeStyleManager.getInstance(project).reformat(file)
+        }
+
+        val expected = "a:{\n  a1:{\n  }\n  a2:{\n  }\n}\n"
+        assertEquals(expected.trimEnd(), file.text.trimEnd())
     }
 }

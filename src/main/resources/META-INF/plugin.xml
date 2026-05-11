@@ -23,6 +23,8 @@
         <annotator language="JisonSchema" implementationClass="com.github.sshnoodles.jisonideaplugin.lang.JisonFormatAnnotator"/>
         <annotator language="TEXT" implementationClass="com.github.sshnoodles.jisonideaplugin.lang.JisonFormatAnnotator"/>
 
+        <externalFormatProcessor implementation="com.github.sshnoodles.jisonideaplugin.lang.JisonExternalFormatProcessor"/>
+
         <completion.contributor language="Jison" implementationClass="com.github.sshnoodles.jisonideaplugin.completion.JisonCompletionContributor"/>
         <completion.contributor language="JisonSchema" implementationClass="com.github.sshnoodles.jisonideaplugin.completion.JisonCompletionContributor"/>
 
