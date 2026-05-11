@@ -6,3 +6,8 @@
 ### Added
 - Jison and Jison Schema language support for `.jison`, `.jisonschema`, and `.jison.schema` files.
 - Syntax highlighting for keys, values, braces, directives, escapes, and comments.
+
+## [0.0.2] - 2026-05-11
+### Added
+- Formatting support.
+
